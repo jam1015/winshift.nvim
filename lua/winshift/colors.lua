@@ -199,6 +199,8 @@ M.hl_links = {
 }
 
 ------------------------ begin ISC licensed code
+-- translated from the code found in colour.c in tmux
+
 -- Copyright (c) 2008 Nicholas Marriott <nicholas.marriott@gmail.com>
 -- Copyright (c) 2016 Avi Halachmi <avihpit@yahoo.com>
 
