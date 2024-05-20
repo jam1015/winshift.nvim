@@ -111,9 +111,16 @@ end
 ---@param group string Syntax group name.
 ---@param opt HiSpec
 
+
 function M.hi(group, opt)
   local use_tc = vim.o.termguicolors
   local g = use_tc and "gui" or "cterm"
+
+  -- Check if highlight group exists; if not, create a basic version of it
+  local exists = vim.fn.hlexists(group)
+  if not exists then
+    vim.cmd("hi " .. group .. " ctermfg=NONE ctermbg=NONE guifg=NONE guibg=NONE")
+  end
 
   local cmd = "hi " .. (opt.default and "def " or "") .. group
 
@@ -147,6 +154,7 @@ function M.hi(group, opt)
 
   vim.cmd(cmd)
 end
+
 
 
 ---@param from string Syntax group name.
