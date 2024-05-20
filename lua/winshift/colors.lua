@@ -110,41 +110,44 @@ end
 
 ---@param group string Syntax group name.
 ---@param opt HiSpec
+
 function M.hi(group, opt)
   local use_tc = vim.o.termguicolors
   local g = use_tc and "gui" or "cterm"
 
+  local cmd = "hi " .. (opt.default and "def " or "") .. group
+
   if not use_tc then
     if opt.ctermfg then
       opt.fg = opt.ctermfg
+      cmd = cmd .. " ctermfg=" .. opt.fg
     end
     if opt.ctermbg then
       opt.bg = opt.ctermbg
+      cmd = cmd .. " ctermbg=" .. opt.bg
     end
-
-    local fg_256 = M.rgbtox256(opt.fg)
-    local bg_256 = M.rgbtox256(opt.bg)
-
-		if fg_256 then
-			opt.fg = fg_256
-		end
-
-		if bg_256 then
-			opt.bg = bg_256
-		end
+  else
+    if opt.fg then
+      cmd = cmd .. " guifg=" .. opt.fg
+    end
+    if opt.bg then
+      cmd = cmd .. " guibg=" .. opt.bg
+    end
   end
 
-  vim.cmd(string.format(
-    "hi %s %s %s %s %s %s %s",
-    opt.default and "def" or "",
-    group,
-    opt.fg and (g .. "fg=" .. opt.fg) or "",
-    opt.bg and (g .. "bg=" .. opt.bg) or "",
-    opt.gui and ((use_tc and "gui=" or "cterm=") .. opt.gui) or "",
-    opt.sp and ("guisp=" .. opt.sp) or "",
-    opt.blend and ("blend=" .. opt.blend) or ""
-  ))
+  if opt.gui then
+    cmd = cmd .. " " .. (use_tc and "gui=" or "cterm=") .. opt.gui
+  end
+  if opt.sp then
+    cmd = cmd .. " guisp=" .. opt.sp
+  end
+  if opt.blend then
+    cmd = cmd .. " blend=" .. opt.blend
+  end
+
+  vim.cmd(cmd)
 end
+
 
 ---@param from string Syntax group name.
 ---@param to? string Syntax group name. (default: `"NONE"`)
