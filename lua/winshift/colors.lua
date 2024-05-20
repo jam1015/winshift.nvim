@@ -218,54 +218,54 @@ M.hl_links = {
 
 
 local function hex_to_rgb(hex)
-    -- Check if the input is a string
-    if type(hex) ~= "string" then
-        return nil
-    end
+  -- Check if the input is a string
+  if type(hex) ~= "string" then
+    return nil
+  end
 
-    if string.match(hex, "^#%x%x%x%x%x%x$") then
-        local r, g, b = hex:match("#(%x%x)(%x%x)(%x%x)")
-        return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
-    else
-        return nil, nil, nil
-    end
+  if string.match(hex, "^#%x%x%x%x%x%x$") then
+    local r, g, b = hex:match("#(%x%x)(%x%x)(%x%x)")
+    return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
+  else
+    return nil, nil, nil
+  end
 end
 
 function M.v2ci(v)
-    if v < 48 then return 0
-    elseif v < 115 then return 1
-    else return math.floor((v - 35) / 40)
-    end
+  if v < 48 then return 0
+  elseif v < 115 then return 1
+  else return math.floor((v - 35) / 40)
+  end
 end
 
 function M.color_index(ir, ig, ib)
-    return 36 * ir + 6 * ig + ib
+  return 36 * ir + 6 * ig + ib
 end
 
 function M.dist_square(A, B, C, a, b, c)
-    return (A-a)^2 + (B-b)^2 + (C-c)^2
+  return (A-a)^2 + (B-b)^2 + (C-c)^2
 end
 
 -- checkss if input is a  hex value, if it is return a similar 256 value integer, else return nil
 function M.rgbtox256(hex)
-    local r, g, b = hex_to_rgb(hex)
-    if r == nil then return nil end
+  local r, g, b = hex_to_rgb(hex)
+  if r == nil then return nil end
 
-    local ir, ig, ib = M.v2ci(r), M.v2ci(g), M.v2ci(b)
-    local average = (r + g + b) / 3
-    local gray_index = average > 238 and 23 or math.floor((average - 3) / 10)
-    local i2cv = {0, 0x5f, 0x87, 0xaf, 0xd7, 0xff}
-    local cr, cg, cb = i2cv[ir + 1], i2cv[ig + 1], i2cv[ib + 1]
-    local gv = 8 + 10 * gray_index
+  local ir, ig, ib = M.v2ci(r), M.v2ci(g), M.v2ci(b)
+  local average = (r + g + b) / 3
+  local gray_index = average > 238 and 23 or math.floor((average - 3) / 10)
+  local i2cv = {0, 0x5f, 0x87, 0xaf, 0xd7, 0xff}
+  local cr, cg, cb = i2cv[ir + 1], i2cv[ig + 1], i2cv[ib + 1]
+  local gv = 8 + 10 * gray_index
 
-    local color_err = M.dist_square(cr, cg, cb, r, g, b)
-    local gray_err = M.dist_square(gv, gv, gv, r, g, b)
+  local color_err = M.dist_square(cr, cg, cb, r, g, b)
+  local gray_err = M.dist_square(gv, gv, gv, r, g, b)
 
-    if color_err <= gray_err then
-        return 16 + M.color_index(ir, ig, ib)
-    else
-        return 232 + gray_index
-    end
+  if color_err <= gray_err then
+    return 16 + M.color_index(ir, ig, ib)
+  else
+    return 232 + gray_index
+  end
 end
 ---------------------- end ISC licensed code
 
