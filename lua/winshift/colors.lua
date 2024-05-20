@@ -112,16 +112,15 @@ end
 ---@param opt HiSpec
 
 
-function M.hi(group, opt)
-  local use_tc = vim.o.termguicolors
-  local g = use_tc and "gui" or "cterm"
 
-  -- Check if highlight group exists; if not, create a basic version of it
-  local exists = vim.fn.hlexists(group)
-  if not exists then
-    vim.cmd("hi " .. group .. " ctermfg=NONE ctermbg=NONE guifg=NONE guibg=NONE")
+function M.hi(group, opt)
+  -- Ensure the highlight group exists or create a default one
+  if vim.fn.hlexists(group) == 0 then
+    vim.cmd("silent! highlight " .. group .. " ctermfg=NONE ctermbg=NONE guifg=NONE guibg=NONE")
   end
 
+  local use_tc = vim.o.termguicolors
+  local g = use_tc and "gui" or "cterm"
   local cmd = "hi " .. (opt.default and "def " or "") .. group
 
   if not use_tc then
@@ -152,23 +151,18 @@ function M.hi(group, opt)
     cmd = cmd .. " blend=" .. opt.blend
   end
 
-  vim.cmd(cmd)
+  vim.cmd("silent! " .. cmd)
 end
-
-
 
 ---@param from string Syntax group name.
 ---@param to? string Syntax group name. (default: `"NONE"`)
 ---@param opt? HiLinkSpec
 function M.hi_link(from, to, opt)
-  opt = opt or {}
-  vim.cmd(string.format(
-    "hi%s %s link %s %s",
+  vim.cmd(string.format("silent! hi%s %s link %s %s",
     opt.force and "!" or "",
     opt.default and "default" or "",
     from,
-    to or "NONE"
-  ))
+    to or "NONE"))
 end
 
 function M.get_colors()
@@ -189,8 +183,8 @@ function M.get_hl_groups()
   local hl_focused = config.get_config().focused_hl_group
   local reverse = M.get_hl_attr(hl_focused, "reverse") == "1"
   local bg_focused = reverse
-    and (M.get_fg({ hl_focused, "Normal" }) or "white")
-    or (M.get_bg({ hl_focused, "Normal" }) or "white")
+      and (M.get_fg({ hl_focused, "Normal" }) or "white")
+      or (M.get_bg({ hl_focused, "Normal" }) or "white")
   local fg_focused = reverse and (M.get_bg({ hl_focused, "Normal" }) or "black") or nil
 
   return {
@@ -218,7 +212,7 @@ M.hl_links = {
 -- Permission to use, copy, modify, and distribute this software for any
 -- purpose with or without fee is hereby granted, provided that the above
 -- copyright notice and this permission notice appear in all copies.
--- 
+--
 -- THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 -- WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 -- MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -243,9 +237,12 @@ local function hex_to_rgb(hex)
 end
 
 function M.v2ci(v)
-  if v < 48 then return 0
-  elseif v < 115 then return 1
-  else return math.floor((v - 35) / 40)
+  if v < 48 then
+    return 0
+  elseif v < 115 then
+    return 1
+  else
+    return math.floor((v - 35) / 40)
   end
 end
 
@@ -254,7 +251,7 @@ function M.color_index(ir, ig, ib)
 end
 
 function M.dist_square(A, B, C, a, b, c)
-  return (A-a)^2 + (B-b)^2 + (C-c)^2
+  return (A - a) ^ 2 + (B - b) ^ 2 + (C - c) ^ 2
 end
 
 -- checkss if input is a  hex value, if it is return a similar 256 value integer, else return nil
@@ -265,7 +262,7 @@ function M.rgbtox256(hex)
   local ir, ig, ib = M.v2ci(r), M.v2ci(g), M.v2ci(b)
   local average = (r + g + b) / 3
   local gray_index = average > 238 and 23 or math.floor((average - 3) / 10)
-  local i2cv = {0, 0x5f, 0x87, 0xaf, 0xd7, 0xff}
+  local i2cv = { 0, 0x5f, 0x87, 0xaf, 0xd7, 0xff }
   local cr, cg, cb = i2cv[ir + 1], i2cv[ig + 1], i2cv[ib + 1]
   local gv = 8 + 10 * gray_index
 
@@ -278,6 +275,7 @@ function M.rgbtox256(hex)
     return 232 + gray_index
   end
 end
+
 ---------------------- end ISC licensed code
 
 
